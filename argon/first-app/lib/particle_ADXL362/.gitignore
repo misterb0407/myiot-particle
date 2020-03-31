@@ -1,6 +1,3 @@
-# Prerequisites
-*.d
-
 # Compiled Object files
 *.slo
 *.lo
@@ -30,7 +27,3 @@
 *.exe
 *.out
 *.app
-*.bin
-
-# Misc
-*.swp
