@@ -7,14 +7,30 @@
 
  #include "InternetButton.h"
 
-// setup() runs once, when the device is first turned on.
+ bool flag = false;
+ int analogvalue = 0;
+ double tempC = 0;
+ char* message = "my name is particle";
+ String aString;
+
 void setup() {
-  // Put initialization like pinMode and begin functions here.
+    Particle.variable("flag", flag);
+    Particle.variable("analogvalue", analogvalue);
+    Particle.variable("temp", tempC);
+    if(Particle.variable("mess", message) == false)
+    {
+        //variable not registered!
+    }
+    Particle.variable("mess2", aString);
+
+    pinMode(A0, INPUT);
 
 }
 
-// loop() runs over and over again, as quickly as it can execute.
 void loop() {
-  // The core of your code will likely live here.
-
+    //Read the analog value of the sensor TMP36
+    analogvalue = analogRead(A0);
+    //convert the reading into degree Celcius
+    tempC = (((analogvalue * 3.3) / 4095) - 0.5) *100;
+    delay(200);
 }
