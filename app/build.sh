@@ -7,14 +7,16 @@
 #### Author: Parhusip, Babang Putra
 #### Date: 04-Apr-2020
 
+export PRJ_PATH=../
+
+export PATH=$PRJ_PATH/toolchains/gcc-arm/9.2.1/bin:$PATH
 
 export PARTICLE_CLI_PATH=$HOME/bin/particle
 export APPDIR=$PWD
-export DEVICE_OS_PATH=../device-os
+export DEVICE_OS_PATH=$PRJ_PATH/device-os
 export PLATFORM=argon
-#export PLATFORM_ID=  # no need, the Workbench platform deduce this from $PLATFORM
 
-#TODO : to implement check whether particle workbench and cli has been installed
+#TODO : to implement check whether all toolchains are in place
 
 print_usage() {
     echo "Usage:"

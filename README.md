@@ -8,6 +8,9 @@ Compiler
 Dowload compiler tar from
 https://launchpad.net/gcc-arm-embedded/+series
 
+newer release from
+https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads
+
 $ tar xjf <.bz2>
 Then add the bin path to path
 
