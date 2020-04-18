@@ -3,7 +3,7 @@
 bool flag = false;
 int analogvalue = 0;
 double tempC = 0;
-char* message = "my name is Babang";
+String message = "my name is Babang Putra";
 String aString;
 
 void setup() {
