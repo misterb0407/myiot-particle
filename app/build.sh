@@ -7,10 +7,9 @@
 #### Author: Parhusip, Babang Putra
 #### Date: 04-Apr-2020
 
-export PRJ_PATH=../
+export PRJ_PATH=..
 
-export PATH=$PRJ_PATH/toolchains/gcc-arm/9.2.1/bin:$PATH
-
+export PATH=$HOME/.particle/toolchains/gcc-arm/5.3.1/bin:$PATH
 export PARTICLE_CLI_PATH=$HOME/bin/particle
 export APPDIR=$PWD
 export DEVICE_OS_PATH=$PRJ_PATH/device-os
@@ -28,7 +27,7 @@ print_usage() {
 
 # if no argument, by default just compile the change only, no clean
 if [[ $# -eq 0 ]]; then
-    make compile-all
+    make compile-all v=0
     exit 0
 fi
 
@@ -71,4 +70,4 @@ case $clean_opt in
         ;;
 esac
 
-make compile-all
+make compile-all v=0
