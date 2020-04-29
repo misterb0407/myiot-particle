@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# (c) IMT - Information Management Technology AG, CH-9470 Buchs, www.imt.ch.
-# SW guideline: Technote Coding Guidelines Ver. 1.6 
-
 #### Description: A wrapper build script on top of Particle Workbench Platform.
 #### It is assumed the Workbench platform and tool chain has been installed in
 #### ~/.particle path. If not, install it from
@@ -22,9 +19,11 @@ check_env() {
     fi
 
     # Ensure Particle CLI has been instaled
-    if [ ! -x $HOME/bin/particle ] ; then
+    type -P particle
+    if [ $? -gt 0 ] ; then
         echo "Particle CLI not detected, install it by:"
         echo "bash <( curl -sL https://particle.io/install-cli )"
+        echo "and add to PATH"
         exit 1;
     fi
 }
@@ -43,38 +42,96 @@ setup_env() {
 
 print_usage() {
     echo "Usage:"
-    echo -e "\t ./build.sh -h         Display help."
-    echo -e "\t ./build.sh -c all     Clean both devos and app fw."
-    echo -e "\t ./build.sh -c app     Clean app fw only excluding devos fw."
+    echo -e "\t ./build.sh -h                               Display help."
+    echo -e "\t ./build.sh -c [all/app] -l [usb/cloud] -v   Clean and build with given option, optional verbose"
     echo -e "\n"
 }
 
+build_bin() {
+
+    # Clean
+    case $clean_opt in
+        all)
+            echo "clean both devos fw and app fw"
+            make clean-all
+            ;;
+        app)
+            echo "clean app fw"
+            make clean-user
+            ;;
+        *)
+            # do nothing, user does not want to clean
+            ;;
+    esac
+
+    # Build
+    make compile-all v=$verbose_level
+}
+
+load_bin() {
+    case $load_opt in
+        usb)
+            echo "loading binary via usb"
+            particle usb dfu
+            particle flash --usb ./target/electron/*.bin
+            ;;
+        cloud)
+            echo " Loading via cloud Not supported yet!"
+            exit 1
+            ;;
+        *)
+            exit 0 #user doesn't want to load
+            ;;
+    esac
+
+}
+
+### Entry ###
 check_env
 setup_env
+
+# default options
+clean_opt=""
+load_opt=""
+verbose_level=0 # silent by default
+
 
 # if no argument, by default just rebuild with change in app code only. In
 # Bernina Device, most of the time, we should not need to touch device OS fw.
 if [[ $# -eq 0 ]]; then
-    make compile-user
+    make compile-user v=0
     exit 0
 fi
 
 # Anything inside "::" are valid options.
-while getopts ":hc:" opt; do
+while getopts ":h:v:c:l:" opt; do
     case ${opt} in
-        h )
+        h)
             print_usage
             exit 0
             ;;
         c)
             clean_opt=$OPTARG
+            echo "clean $clean_opt"
+            ;;
+        l)
+            load_opt=$OPTARG
+            echo "load $load_opt"
             ;;
         :)
-            echo "Invalid option: $OPTARG" 1>&2
-            print_usage
-            exit 1
+            case $OPTARG in
+                v)
+                    verbose_level=1
+                    echo "verbose $verbose_level"
+                    ;;
+                *)
+                    echo "Invalid option: $OPTARG" 1>&2
+                    print_usage
+                    exit 1
+            esac
             ;;
-        \? )
+
+        \?)
             echo "Invalid Option: -$OPTARG" 1>&2
             print_usage
             exit 1
@@ -82,20 +139,5 @@ while getopts ":hc:" opt; do
     esac
 done
 
-case $clean_opt in
-    all)
-        echo "clean both devos fw and app fw"
-        make clean-all
-        ;;
-    app)
-        echo "clean app fw"
-        make clean-user
-        ;;
-    *)
-       echo "unknown -c argument" "$clean_opt"
-        print_usage
-        exit 1
-        ;;
-esac
-
-make compile-all
+build_bin
+load_bin
