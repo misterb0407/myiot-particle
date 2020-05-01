@@ -11,8 +11,11 @@ import sys
 import time
 import json
 import base64
+import threading
 
 from sseclient import SSEClient
+
+lock = threading.Lock()
 
 # dictionary of device name to device id
 devid = {
@@ -61,7 +64,6 @@ def decode(event):
     # still can understand the data
     # ref: you can checkout the method in DecodeV1ObservationValues
     # in MessageDecoder.cs
-    sys.exit(1)
     print(base64.b64decode(data_base64))
 
 def is_found(devicename):
@@ -78,11 +80,24 @@ def print_valid_devices():
     for dev in list(devid):
         print(dev)
 
-def get_stream(event):
+def get_stream(event_type):
     """To get the stream events object."""
-    url =  "https://api.particle.io/v1/events/"+event
+    url =  "https://api.particle.io/v1/events/"+event_type
     headers = {'Authorization': 'Bearer '+args.token}
-    return SSEClient(url, headers = headers)
+
+    events = SSEClient(url, headers = headers)
+    start_time = int(time.time())
+    for event in events:
+        if event.data.count('data') > 0:
+            coreid = json.loads(event.data)['coreid']
+            if coreid.strip() == devid[args.devname].strip():
+                lock.acquire()
+                events_cnt[event_type] += 1
+                lock.release()
+                decode(event)
+
+        if((int(time.time()) - start_time) > args.duration):
+            break
 
 if __name__ == '__main__':
     args = get_args()
@@ -94,19 +109,18 @@ if __name__ == '__main__':
 
     # TODO: to query for all events, for now just one
     # Maybe can leverage python multi threading feature?
-    event_type = 'v1-observation-values'
-    events = get_stream(event_type)
+    #event_type = 'v1-observation-values'
+    #get_stream(event_type)
+    threads = []
+    for event_type in list(events_cnt):
+        print("Start thread for %s" %(event_type))
+        threads.append(threading.Thread(target=get_stream,args=(event_type,)))
 
-    start_time = int(time.time())
-    for event in events:
-        if event.data.count('data') > 0:
-            coreid = json.loads(event.data)['coreid']
-            if coreid.strip() == devid[args.devname].strip():
-                events_cnt[event_type] +=1
-                decode(event)
+    for thread in threads:
+        thread.start()
 
-        if((int(time.time()) - start_time) > args.duration):
-            break
+    for thread in threads:
+        thread.join()
 
 
     # Summary
