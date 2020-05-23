@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 
 #### Description: A wrapper build script on top of Particle Workbench Platform.
 #### It is assumed the Workbench platform and tool chain has been installed in
@@ -12,15 +12,14 @@ export TOOLCHAINS_PATH=$HOME/.particle/toolchains
 # To ensure toolchains installed
 check_env() {
     # Ensure Particle Workbench has been installed
-    if [ ! -d $TOOLCHAINS_PATH ] ; then
+    if [ ! -d "$TOOLCHAINS_PATH" ] ; then
         echo " $TOOLCHAINS_PATH not found!"
         echo "Install Particle Workbench Toolchains from https://www.particle.io/workbench/"
         exit 1;
     fi
 
     # Ensure Particle CLI has been instaled
-    type -P particle
-    if [ $? -gt 0 ] ; then
+    if ! type -P particle ; then
         echo "Particle CLI not detected, install it by:"
         echo "bash <( curl -sL https://particle.io/install-cli )"
         echo "and add to PATH"
@@ -36,7 +35,7 @@ setup_env() {
     # For particle build environment
     export PARTICLE_CLI_PATH=$HOME/bin/particle
     export APPDIR=$PWD
-    export DEVICE_OS_PATH=../device-os
+    export DEVICE_OS_PATH=$TOOLCHAINS_PATH/deviceOS/1.5.0
     export PLATFORM=argon
 }
 
@@ -47,8 +46,7 @@ print_usage() {
     echo -e "\n"
 }
 
-build_bin() {
-
+clean_bin() {
     # Clean
     case $clean_opt in
         all)
@@ -64,8 +62,20 @@ build_bin() {
             ;;
     esac
 
+    clean_error=$?
+    if [ "$clean_error" -gt 0 ] ; then
+        exit $clean_error
+    fi
+}
+
+build_bin() {
     # Build
-    make compile-all v=$verbose_level
+    make compile-all v="$verbose_level"
+
+    build_error=$?
+    if [ "$build_error" -gt 0 ] ; then
+        exit $build_error
+    fi
 }
 
 load_bin() {
@@ -73,7 +83,7 @@ load_bin() {
         usb)
             echo "loading binary via usb"
             particle usb dfu
-            particle flash --usb ./target/$PLATFORM/*.bin
+            particle flash --usb ./target/argon/*.bin
             ;;
         cloud)
             echo " Loading via cloud Not supported yet!"
@@ -94,14 +104,6 @@ setup_env
 clean_opt=""
 load_opt=""
 verbose_level=0 # silent by default
-
-
-# if no argument, by default just rebuild with change in app code only. In
-# Bernina Device, most of the time, we should not need to touch device OS fw.
-if [[ $# -eq 0 ]]; then
-    make compile-user v=0
-    exit 0
-fi
 
 # Anything inside "::" are valid options.
 while getopts ":h:v:c:l:" opt; do
@@ -139,5 +141,6 @@ while getopts ":h:v:c:l:" opt; do
     esac
 done
 
+clean_bin
 build_bin
 load_bin
