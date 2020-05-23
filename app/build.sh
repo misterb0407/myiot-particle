@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/bin/bash
 
 #### Description: A wrapper build script on top of Particle Workbench Platform.
 #### It is assumed the Workbench platform and tool chain has been installed in
