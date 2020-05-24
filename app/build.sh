@@ -8,6 +8,7 @@
 #### Date: 04-Apr-2020
 
 export TOOLCHAINS_PATH=$HOME/.particle/toolchains
+export MAKE_FILE=$TOOLCHAINS_PATH/buildscripts/1.9.2/Makefile
 
 # To ensure toolchains installed
 check_env() {
@@ -51,11 +52,11 @@ clean_bin() {
     case $clean_opt in
         all)
             echo "clean both devos fw and app fw"
-            make clean-all
+            make -f "$MAKE_FILE" clean-all
             ;;
         app)
             echo "clean app fw"
-            make clean-user
+            make -f "$MAKE_FILE" clean-user
             ;;
         *)
             # do nothing, user does not want to clean
@@ -70,7 +71,7 @@ clean_bin() {
 
 build_bin() {
     # Build
-    make compile-all v="$verbose_level"
+    make -f "$MAKE_FILE" compile-all v="$verbose_level"
 
     build_error=$?
     if [ "$build_error" -gt 0 ] ; then
