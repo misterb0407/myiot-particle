@@ -6,7 +6,9 @@ double tempC = 0;
 String message = "my name is Babang Putra";
 String aString;
 
+
 void setup() {
+    API.init();
     Particle.variable("flag", flag);
     Particle.variable("analogvalue", analogvalue);
     Particle.variable("temp", tempC);
@@ -25,5 +27,6 @@ void loop() {
     analogvalue = analogRead(A0);
     //convert the reading into degree Celcius
     tempC = (((analogvalue * 3.3) / 4095) - 0.5) *100;
-    delay(200);
+    Log.info("testing %lf", tempC);
+    delay(2000);
 }

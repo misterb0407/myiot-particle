@@ -8,7 +8,9 @@ class Platform {
         Platform(Platform const&) = delete;
         Platform& operator=(Platform const&) = delete;
 
-        Platform& getInstance();
+        static Platform& getInstance();
+
+        static void init();
 
     private:
         explicit Platform() {};
@@ -16,3 +18,4 @@ class Platform {
 
 } // namespace platform
 using platform::Platform;
+extern const platform::Platform& API;

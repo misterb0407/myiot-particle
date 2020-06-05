@@ -36,5 +36,8 @@
 # Misc
 *.swp
 
-# LSP artifacts
+# LSP/code indexing artifacts
 compile_commands.json
+.clangd
+cscope.files
+cscope.out
