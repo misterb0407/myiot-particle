@@ -12,7 +12,11 @@ const Platform& API = Platform::getInstance();
  * sinks for overall logging both from system and application.
  * ref: https://docs.particle.io/reference/device-os/firmware/argon/#logging
  */
-SerialLogHandler logHandler;
+
+SerialLogHandler logHandler(LOG_LEVEL_WARN, {
+    { "app", LOG_LEVEL_INFO },
+    { "app.network", LOG_LEVEL_TRACE }
+});
 
 Platform& Platform::getInstance() {
     static Platform Instance;

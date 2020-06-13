@@ -9,11 +9,9 @@ class App {
         }
 };
 
-
 void setup() {
     API.init();
     Particle.function("echo", App::echo);
-
 }
 
 void loop() {
