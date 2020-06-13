@@ -1,5 +1,7 @@
 #include "platform.h"
 
+using namespace platform;
+
 const Platform& API = Platform::getInstance();
 
 /**

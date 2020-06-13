@@ -17,5 +17,5 @@ class Platform {
 };
 
 } // namespace platform
-using platform::Platform;
+
 extern const platform::Platform& API;
