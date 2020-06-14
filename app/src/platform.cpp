@@ -27,3 +27,14 @@ Platform& Platform::getInstance() {
 void Platform::init() {
 }
 
+void Platform::regCloudFunc(platform::CloudFunc* fns, uint32_t count) {
+    if (fns == nullptr) {
+        return;
+    }
+
+    for(auto i = 0U; i < count; i++) {
+        Particle.function(fns->name, fns->fn);
+        fns++;
+    }
+}
+
