@@ -3,12 +3,6 @@
 
 namespace platform {
 
-
-struct CloudFunc {
-    const char* name;
-    std::function<int32_t(String)> fn;
-};
-
 // Singleton class acts as platform wrapper
 class Platform {
     public:
@@ -20,10 +14,8 @@ class Platform {
 
         static void init();
 
-        static void regCloudFunc(platform::CloudFunc* fns, uint32_t count);
-
     private:
-        explicit Platform() {};
+        explicit Platform() = default;
 };
 
 } // namespace platform
