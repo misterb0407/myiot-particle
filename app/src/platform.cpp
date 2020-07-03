@@ -2,7 +2,7 @@
 
 using namespace platform;
 
-const Platform& API = Platform::getInstance();
+const Platform &API = Platform::getInstance();
 
 /**
  * As per device OS documentation, applicationn still need
@@ -13,17 +13,13 @@ const Platform& API = Platform::getInstance();
  * ref: https://docs.particle.io/reference/device-os/firmware/argon/#logging
  */
 
-SerialLogHandler logHandler(LOG_LEVEL_WARN, {
-    { "app", LOG_LEVEL_INFO },
-    { "app.network", LOG_LEVEL_TRACE }
-});
+SerialLogHandler logHandler(LOG_LEVEL_WARN, {{"app", LOG_LEVEL_INFO},
+                                             {"app.network", LOG_LEVEL_TRACE}});
 
-Platform& Platform::getInstance() {
+Platform &Platform::getInstance() {
     static Platform Instance;
 
     return Instance;
 }
 
-void Platform::init() {
-}
-
+void Platform::init() {}
