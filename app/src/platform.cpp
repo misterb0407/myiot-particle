@@ -13,8 +13,11 @@ const Platform &API = Platform::getInstance();
  * ref: https://docs.particle.io/reference/device-os/firmware/argon/#logging
  */
 
-SerialLogHandler logHandler(LOG_LEVEL_WARN, {{"app", LOG_LEVEL_INFO},
-                                             {"app.network", LOG_LEVEL_TRACE}});
+SerialLogHandler logHandler(LOG_LEVEL_INFO, {{"app", LOG_LEVEL_INFO},
+                                             {"comm.protocol", LOG_LEVEL_WARN},
+                                             {"gsm0710muxer", LOG_LEVEL_WARN},
+                                             {"comm.dtls", LOG_LEVEL_WARN},
+                                             });
 
 Platform &Platform::getInstance() {
     static Platform Instance;
