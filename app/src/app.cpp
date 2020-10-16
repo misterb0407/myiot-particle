@@ -6,6 +6,7 @@
 DHT dht(D2); // temperature and humidity sensor
 ChainableLED leds(A4, A5, 1); // Chainable LED
 double currentLightLevel;
+double g_LightTreshold = 50;
 
 void eventHandler(system_event_t event, int param) {
     uint32_t lsb_event = static_cast<uint32_t>(event);
@@ -21,6 +22,12 @@ int toggleLed(String args) {
     return 1;
 }
 
+int setLightTreshold(String args) {
+    g_LightTreshold = args.toFloat();
+
+    return g_LightTreshold;
+}
+
 void setup() {
     API.init();
     System.on(all_events, &eventHandler);
@@ -28,6 +35,9 @@ void setup() {
     leds.init();
     leds.setColorHSB(0, 0.0, 0.0, 0.0);
     pinMode(A0, INPUT);// light sensor as input
+
+    //  Cloud functions
+    Particle.function("light treshold", setLightTreshold);
 }
 
 
@@ -44,7 +54,7 @@ void loop() {
 
     double lightAnalogVal = analogRead(A0);
     currentLightLevel = map(lightAnalogVal, 0.0, 4095.0, 0.0, 100.0);
-    if (currentLightLevel > 50) {
+    if (currentLightLevel > g_LightTreshold) {
         Particle.publish("light-meter/level",
         String(currentLightLevel), PRIVATE);
     }
