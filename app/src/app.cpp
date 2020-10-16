@@ -19,11 +19,11 @@ void setup() {
 void loop() {
     float temp, humidity;
 
-    temp = dht.getTempFarenheit();
+    temp = dht.getTempCelcius();
     humidity = dht.getHumidity();
 
-    Serial.printlnf("Temp: %f", temp);
-    Serial.printlnf("Humidity: %f", humidity);
+    Serial.printlnf("Temp: %0.2f C", temp);
+    Serial.printlnf("Humidity: %0.2f", humidity);
 
-    delay(10000);delay(2000); 
+    delay(2000);
 }
