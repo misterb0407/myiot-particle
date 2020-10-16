@@ -5,6 +5,7 @@
 
 DHT dht(D2); // temperature and humidity sensor
 ChainableLED leds(A4, A5, 1); // Chainable LED
+double currentLightLevel;
 
 void eventHandler(system_event_t event, int param) {
     uint32_t lsb_event = static_cast<uint32_t>(event);
@@ -12,15 +13,12 @@ void eventHandler(system_event_t event, int param) {
 }
 
 int toggleLed(String args) {
-leds.setColorHSB(0, 0.0, 1.0, 0.5);// turn red
+    leds.setColorHSB(0, 0.0, 1.0, 0.5);// turn red
+    delay(500);
+    leds.setColorHSB(0, 0.0, 0.0, 0.0);// turn off
+    delay(500);
 
-delay(500);
-
-leds.setColorHSB(0, 0.0, 0.0, 0.0);// turn off
-
-delay(500);
-
-return 1;
+    return 1;
 }
 
 void setup() {
@@ -29,6 +27,7 @@ void setup() {
     dht.begin();
     leds.init();
     leds.setColorHSB(0, 0.0, 0.0, 0.0);
+    pinMode(A0, INPUT);// light sensor as input
 }
 
 
@@ -42,5 +41,14 @@ void loop() {
     Serial.printlnf("Humidity: %0.2f", humidity);
 
     toggleLed("");
+
+    double lightAnalogVal = analogRead(A0);
+    currentLightLevel = map(lightAnalogVal, 0.0, 4095.0, 0.0, 100.0);
+    if (currentLightLevel > 50) {
+        Particle.publish("light-meter/level",
+        String(currentLightLevel), PRIVATE);
+    }
+    Serial.printlnf("light level: %0.2f", currentLightLevel);
+
     delay(2000);
 }
