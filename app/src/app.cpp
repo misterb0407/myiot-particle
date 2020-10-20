@@ -65,8 +65,10 @@ void loop() {
 
     if ((currentHumidity - prevHumidity >= 5) || (currentHumidity <= prevHumidity - 5)) {
         Serial.printlnf("Humidity: %0.2f", currentHumidity);
+#if(0)
         Particle.publish("humidity/level",
         String(currentHumidity), PRIVATE);
+#endif
         delay(1000);
     }
 
