@@ -5,7 +5,8 @@
 
 DHT dht(D2); // temperature and humidity sensor
 ChainableLED leds(A4, A5, 1); // Chainable LED
-double currentLightLevel;
+double currentLightLevel = 0;
+double prevLightLevel = currentLightLevel;
 double g_LightTreshold = 50;
 
 void eventHandler(system_event_t event, int param) {
@@ -53,12 +54,14 @@ void loop() {
     toggleLed("");
 
     double lightAnalogVal = analogRead(A0);
+    prevLightLevel = currentLightLevel;
     currentLightLevel = map(lightAnalogVal, 0.0, 4095.0, 0.0, 100.0);
-    if (currentLightLevel > g_LightTreshold) {
+    if ((currentLightLevel > (prevLightLevel + 5)) || (currentLightLevel < (prevLightLevel - 5))) {
         Particle.publish("light-meter/level",
         String(currentLightLevel), PRIVATE);
+        delay(1000);
     }
     Serial.printlnf("light level: %0.2f", currentLightLevel);
 
-    delay(2000);
+    delay(100);
 }
