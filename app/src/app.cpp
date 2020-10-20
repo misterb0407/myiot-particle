@@ -56,7 +56,7 @@ void loop() {
     double lightAnalogVal = analogRead(A0);
     currentLightLevel = map(lightAnalogVal, 0.0, 4095.0, 0.0, 100.0);
 
-    if ((currentTemp - prevTemp >= 1) || (currentTemp <= prevTemp - 1)) {
+    if ((currentTemp - prevTemp > 2) || (currentTemp < prevTemp - 2)) {
         Serial.printlnf("Temp: %0.2f C", currentTemp);
         Particle.publish("temperature/level",
         String(currentTemp), PRIVATE);
@@ -84,6 +84,6 @@ void loop() {
     prevHumidity = currentHumidity;
     prevLightLevel = currentLightLevel;
 
-    delay(1000);
+    delay(2000);//important for the reading reability
 
 }
