@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "Grove_Temperature_And_Humidity_Sensor.h"
 #include "Grove_ChainableLED.h"
 
@@ -8,6 +10,12 @@ ChainableLED leds(A4, A5, 1); // Chainable LED
 double currentLightLevel = 0;
 double prevLightLevel = currentLightLevel;
 double g_LightTreshold = 50;
+
+double currentHumidity = 0;
+double prevHumidity = currentHumidity;
+
+double currentTemp = 0;
+double prevTemp = 0;
 
 void eventHandler(system_event_t event, int param) {
     uint32_t lsb_event = static_cast<uint32_t>(event);
@@ -43,25 +51,39 @@ void setup() {
 
 
 void loop() {
-    float temp, humidity;
-
-    temp = dht.getTempCelcius();
-    humidity = dht.getHumidity();
-
-    Serial.printlnf("Temp: %0.2f C", temp);
-    Serial.printlnf("Humidity: %0.2f", humidity);
-
-    toggleLed("");
-
+    currentTemp = dht.getTempCelcius();
+    currentHumidity = dht.getHumidity();
     double lightAnalogVal = analogRead(A0);
-    prevLightLevel = currentLightLevel;
     currentLightLevel = map(lightAnalogVal, 0.0, 4095.0, 0.0, 100.0);
+
+    if ((currentTemp - prevTemp >= 1) || (currentTemp <= prevTemp - 1)) {
+        Serial.printlnf("Temp: %0.2f C", currentTemp);
+        Particle.publish("temperature/level",
+        String(currentTemp), PRIVATE);
+        delay(1000);
+    }
+
+    if ((currentHumidity - prevHumidity >= 5) || (currentHumidity <= prevHumidity - 5)) {
+        Serial.printlnf("Humidity: %0.2f", currentHumidity);
+        Particle.publish("humidity/level",
+        String(currentHumidity), PRIVATE);
+        delay(1000);
+    }
+
+
+    //toggleLed("");
+
     if ((currentLightLevel > (prevLightLevel + 5)) || (currentLightLevel < (prevLightLevel - 5))) {
+        Serial.printlnf("light level: %0.2f", currentLightLevel);
         Particle.publish("light-meter/level",
         String(currentLightLevel), PRIVATE);
         delay(1000);
     }
-    Serial.printlnf("light level: %0.2f", currentLightLevel);
 
-    delay(100);
+    prevTemp = currentTemp;
+    prevHumidity = currentHumidity;
+    prevLightLevel = currentLightLevel;
+
+    delay(1000);
+
 }
