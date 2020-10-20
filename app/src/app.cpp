@@ -58,6 +58,7 @@ void loop() {
     currentLightLevel = map(lightAnalogVal, 0.0, 4095.0, 0.0, 100.0);
 
     if(millis() - startTime > 15000) {
+        if(currentTemp > 0 && currentLightLevel > 0) {
         Serial.printlnf("periodic publish");
         Particle.publish("temperature/level",
         String(currentTemp), PRIVATE);
@@ -66,6 +67,7 @@ void loop() {
         Particle.publish("light-meter/level",
         String(currentLightLevel), PRIVATE);
         delay(1000);
+        }
 
         startTime = millis();
         return;
