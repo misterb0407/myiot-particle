@@ -51,27 +51,10 @@ void setup() {
 
 
 void loop() {
-    static uint32_t startTime = millis();
     currentTemp = dht.getTempCelcius();
     currentHumidity = dht.getHumidity();
     double lightAnalogVal = analogRead(A0);
     currentLightLevel = map(lightAnalogVal, 0.0, 4095.0, 0.0, 100.0);
-
-    if(millis() - startTime > 15000) {
-        if(currentTemp > 0 && currentLightLevel > 0) {
-        Serial.printlnf("periodic publish");
-        Particle.publish("temperature/level",
-        String(currentTemp), PRIVATE);
-        delay(1000);
-
-        Particle.publish("light-meter/level",
-        String(currentLightLevel), PRIVATE);
-        delay(1000);
-        }
-
-        startTime = millis();
-        return;
-    }
 
     if ((currentTemp - prevTemp > 2) || (currentTemp < prevTemp - 2)) {
         Serial.printlnf("Temp: %0.2f C", currentTemp);
