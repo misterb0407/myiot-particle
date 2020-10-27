@@ -2,6 +2,7 @@
 
 #include "Grove_Temperature_And_Humidity_Sensor.h"
 #include "Grove_ChainableLED.h"
+#include "PublishQueueAsyncRK.h"
 
 #include "platform.h"
 
@@ -16,6 +17,9 @@ double prevHumidity = currentHumidity;
 
 double currentTemp = 0;
 double prevTemp = 0;
+
+retained uint8_t publishQueueRetainedBuffer[2048];
+PublishQueueAsync publishQueue(publishQueueRetainedBuffer, sizeof(publishQueueRetainedBuffer));
 
 void eventHandler(system_event_t event, int param) {
     uint32_t lsb_event = static_cast<uint32_t>(event);
@@ -58,7 +62,7 @@ void loop() {
 
     if ((currentTemp - prevTemp > 2) || (currentTemp < prevTemp - 2)) {
         Serial.printlnf("Temp: %0.2f C", currentTemp);
-        Particle.publish("temperature/level",
+        publishQueue.publish("temperature/level",
         String(currentTemp), PRIVATE);
         delay(1000);
     }
@@ -66,7 +70,7 @@ void loop() {
     if ((currentHumidity - prevHumidity >= 5) || (currentHumidity <= prevHumidity - 5)) {
         Serial.printlnf("Humidity: %0.2f", currentHumidity);
 #if(0)
-        Particle.publish("humidity/level",
+        publishQueue.publish("humidity/level",
         String(currentHumidity), PRIVATE);
 #endif
         delay(1000);
@@ -77,7 +81,7 @@ void loop() {
 
     if ((currentLightLevel > (prevLightLevel + 5)) || (currentLightLevel < (prevLightLevel - 5))) {
         Serial.printlnf("light level: %0.2f", currentLightLevel);
-        Particle.publish("light-meter/level",
+        publishQueue.publish("light-meter/level",
         String(currentLightLevel), PRIVATE);
         delay(1000);
     }
